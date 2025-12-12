@@ -13,7 +13,14 @@ export default function ConfirmPage() {
 
   useEffect(() => {
     const handleConfirmation = async () => {
-      const { token_hash, type } = router.query;
+      const { token_hash, type, error_description } = router.query;
+
+      // Se veio erro do Supabase
+      if (error_description) {
+        setStatus('error');
+        setMessage(decodeURIComponent(error_description));
+        return;
+      }
 
       if (!token_hash) {
         // Aguardar query params carregarem
@@ -21,32 +28,44 @@ export default function ConfirmPage() {
       }
 
       try {
-        if (type === 'signup' || type === 'email') {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash,
-            type: 'signup',
-          });
+        // Tentar diferentes tipos de verificação
+        const verifyType = type === 'recovery' ? 'recovery' : 'email';
 
-          if (error) {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash,
+          type: verifyType,
+        });
+
+        console.log('Verify response:', { data, error });
+
+        if (error) {
+          // Tentar com tipo 'signup' se 'email' falhar
+          if (verifyType === 'email') {
+            const { data: data2, error: error2 } = await supabase.auth.verifyOtp({
+              token_hash,
+              type: 'signup',
+            });
+
+            if (error2) {
+              console.error('Verify error:', error2);
+              setStatus('error');
+              setMessage('Link de confirmacao invalido ou expirado. Solicite um novo email.');
+              return;
+            }
+          } else {
             setStatus('error');
-            setMessage('Link de confirmacao invalido ou expirado.');
+            setMessage('Link de confirmacao invalido ou expirado. Solicite um novo email.');
             return;
           }
-
-          setStatus('success');
-          setMessage('Email confirmado com sucesso! Redirecionando...');
-
-          setTimeout(() => {
-            router.push('/login');
-          }, 2000);
-        } else if (type === 'recovery') {
-          setStatus('success');
-          setMessage('Redirecionando para redefinir senha...');
-          router.push(`/reset-password?token_hash=${token_hash}`);
-        } else {
-          setStatus('error');
-          setMessage('Tipo de confirmacao desconhecido.');
         }
+
+        setStatus('success');
+        setMessage('Email confirmado com sucesso! Redirecionando para login...');
+
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+
       } catch (err) {
         console.error('Erro na confirmacao:', err);
         setStatus('error');
