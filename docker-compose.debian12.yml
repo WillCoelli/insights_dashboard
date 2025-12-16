@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  insights-dashboard-debian12:
+    build:
+      context: .
+      dockerfile: Dockerfile.debian12
+    container_name: insights-dashboard-debian12
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=https://ixenaufwnyqlkzpgwzoe.supabase.co
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZW5hdWZ3bnlxbGt6cGd3em9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDk5MTgsImV4cCI6MjA4MDgyNTkxOH0.lWgy29Jez6Vb3Ct5iIHUlPcLYklk4Bc7zKuEiCauqfo
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZW5hdWZ3bnlxbGt6cGd3em9lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTI0OTkxOCwiZXhwIjoyMDgwODI1OTE4fQ.1nz0jTCqiu2pV04sELV1-bDTR5E2XF3mn-Yhji6i47U
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
+      - GRAPH_API_VERSION=v21.0
+      - GRAPH_API_URL=https://graph.facebook.com/v21.0
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    networks:
+      - insights-network
+
+networks:
+  insights-network:
+    driver: bridge

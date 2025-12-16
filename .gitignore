@@ -30,3 +30,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .env.production
+.env
+
+# docker local
+docker-compose.override.yml
+
+# temporary files
+nul
+*.tmp
