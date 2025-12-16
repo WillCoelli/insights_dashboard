@@ -38,3 +38,6 @@ docker-compose.override.yml
 # temporary files
 nul
 *.tmp
+
+# build artifacts
+*.tar.gz

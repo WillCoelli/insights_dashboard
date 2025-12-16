@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  insights-dashboard:
+    image: insights-dashboard:latest
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=https://ixenaufwnyqlkzpgwzoe.supabase.co
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZW5hdWZ3bnlxbGt6cGd3em9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyNDk5MTgsImV4cCI6MjA4MDgyNTkxOH0.lWgy29Jez6Vb3Ct5iIHUlPcLYklk4Bc7zKuEiCauqfo
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZW5hdWZ3bnlxbGt6cGd3em9lIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTI0OTkxOCwiZXhwIjoyMDgwODI1OTE4fQ.1nz0jTCqiu2pV04sELV1-bDTR5E2XF3mn-Yhji6i47U
+      - NEXT_PUBLIC_BACKEND_URL=https://gestor.disparazap.com
+      - GRAPH_API_VERSION=v21.0
+    networks:
+      - traefik-public
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.insights.rule=Host(`gestor.disparazap.com`)"
+        - "traefik.http.routers.insights.entrypoints=websecure"
+        - "traefik.http.routers.insights.tls.certresolver=letsencrypt"
+        - "traefik.http.services.insights.loadbalancer.server.port=3000"
+        - "traefik.docker.network=traefik-public"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  traefik-public:
+    external: true
