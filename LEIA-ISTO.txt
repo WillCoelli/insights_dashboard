@@ -1,0 +1,75 @@
+═══════════════════════════════════════════════════════════════
+  🚀 DEPLOY VIA GITHUB - SUPER SIMPLES (3 PASSOS)
+═══════════════════════════════════════════════════════════════
+
+Domínio configurado: gestor.disparazap.com
+
+
+📋 PASSO 1: Criar repo no GitHub
+──────────────────────────────────────────────────────────────
+
+1. Acesse: https://github.com/new
+2. Nome do repo: insights-dashboard
+3. PRIVADO ✅
+4. NÃO marque nada (deixe vazio)
+5. Create repository
+6. COPIE a URL do repo (vai precisar)
+
+
+💻 PASSO 2: No seu PC (PowerShell)
+──────────────────────────────────────────────────────────────
+
+cd C:\Users\William\Desktop\Soft\dev\insights_dashboard
+.\push-github.ps1
+
+(vai pedir a URL do repo GitHub que você copiou)
+
+
+🖥️ PASSO 3: Na VPS
+──────────────────────────────────────────────────────────────
+
+3A) Transferir .env.production (NO PC):
+
+   scp .env.production root@SEU-IP:/tmp/
+
+
+3B) Instalar na VPS (COLE NO TERMINAL DA VPS):
+
+   mkdir -p /opt/insights_dashboard
+   mv /tmp/.env.production /opt/insights_dashboard/
+   curl -sSL https://raw.githubusercontent.com/SEU-USUARIO/insights-dashboard/main/install-vps.sh | bash
+
+   (Substitua SEU-USUARIO pelo seu usuário do GitHub)
+
+
+✅ PRONTO!
+──────────────────────────────────────────────────────────────
+
+Aguarde 2-3 minutos e acesse:
+https://gestor.disparazap.com
+
+
+🔄 PARA ATUALIZAR DEPOIS
+──────────────────────────────────────────────────────────────
+
+No PC:
+   .\push-github.ps1
+
+Na VPS:
+   bash /opt/insights_dashboard/atualizar-vps.sh
+
+
+📚 ARQUIVOS CRIADOS
+──────────────────────────────────────────────────────────────
+
+✓ push-github.ps1          → Enviar código pro GitHub (PC)
+✓ install-vps.sh           → Instalar na VPS (VPS)
+✓ atualizar-vps.sh         → Atualizar na VPS (VPS)
+✓ DEPLOY-GITHUB-SIMPLES.md → Documentação completa
+
+
+═══════════════════════════════════════════════════════════════
+
+Dúvidas? Leia: DEPLOY-GITHUB-SIMPLES.md
+
+═══════════════════════════════════════════════════════════════

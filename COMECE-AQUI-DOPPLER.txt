@@ -1,0 +1,93 @@
+═══════════════════════════════════════════════════════════════
+  🚀 DEPLOY COM DOPPLER - 3 PASSOS SIMPLES
+═══════════════════════════════════════════════════════════════
+
+Dopinio: gestor.disparazap.com
+Plano: 100% GRATUITO (ate 5 usuarios)
+
+
+📋 PASSO 1: Configurar Doppler (10 min)
+──────────────────────────────────────────────────────────────
+
+1. Acesse: https://www.doppler.com
+2. Sign Up (use Google/GitHub)
+3. Create Project: "insights-dashboard"
+4. Clique no ambiente "prd"
+5. Adicione seus secrets (copie do .env.production):
+
+   - NEXT_PUBLIC_SUPABASE_URL
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+   - SUPABASE_SERVICE_ROLE_KEY
+   - GRAPH_API_VERSION
+   - GRAPH_API_URL
+   - NEXT_PUBLIC_BACKEND_URL
+
+6. Access → Service Tokens → Generate
+   Nome: vps-production
+   Environment: prd
+
+7. COPIE O TOKEN! (dp.st.prd.xxxxxxxxxx)
+
+
+🌐 PASSO 2: Upload para GitHub (5 min)
+──────────────────────────────────────────────────────────────
+
+1. Acesse: https://github.com/new
+2. Nome: insights-dashboard
+3. Privado ✅
+4. Create repository
+
+5. Na pagina do repo:
+   - Clique "uploading an existing file"
+   - Arraste TODA a pasta do projeto
+   - Commit changes
+
+IMPORTANTE: Agora PODE enviar o .env.production tambem!
+(Seus secrets estao no Doppler, nao no arquivo)
+
+
+🖥️ PASSO 3: Deploy na VPS (10 min)
+──────────────────────────────────────────────────────────────
+
+Conecte na VPS e cole:
+
+curl -sSL https://raw.githubusercontent.com/SEU-USUARIO/insights-dashboard/main/install-vps-doppler.sh | bash
+
+Substitua SEU-USUARIO pelo seu usuario do GitHub!
+
+Vai pedir:
+1. URL do GitHub repo
+2. Token do Doppler (que voce copiou no passo 1)
+
+Aguarde 2-3 minutos.
+
+
+✅ PRONTO!
+──────────────────────────────────────────────────────────────
+
+Acesse: https://gestor.disparazap.com
+
+
+🔄 ATUALIZAR DEPOIS
+──────────────────────────────────────────────────────────────
+
+Codigo:
+1. Faca alteracoes
+2. Commit no GitHub
+3. Na VPS: bash /opt/insights_dashboard/atualizar-vps-doppler.sh
+
+Secrets:
+1. Edite no Doppler (dashboard.doppler.com)
+2. Na VPS: bash /opt/insights_dashboard/atualizar-vps-doppler.sh
+
+
+📚 DOCUMENTACAO COMPLETA
+──────────────────────────────────────────────────────────────
+
+DOPPLER-SETUP.md        → Como configurar Doppler
+GUIA-RAPIDO-DOPPLER.md  → Guia completo passo a passo
+
+
+═══════════════════════════════════════════════════════════════
+Pronto para comecar? Va para o Passo 1!
+═══════════════════════════════════════════════════════════════
