@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  insights-dashboard:
+    image: ghcr.io/willcoelli/insights_dashboard:1.1.0
+    networks:
+      - traefik-public
+    environment:
+      # Node Environment
+      - NODE_ENV=production
+
+      # Supabase Configuration (OBRIGATORIO)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # Meta Graph API Configuration
+      - GRAPH_API_VERSION=${GRAPH_API_VERSION:-v21.0}
+      - GRAPH_API_URL=https://graph.facebook.com/${GRAPH_API_VERSION:-v21.0}
+
+      # Backend URL
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-https://gestor.disparazap.com}
+
+      # Meta Ads Access Token (opcional)
+      - USER_ACCESS_TOKEN=${USER_ACCESS_TOKEN:-}
+
+      # Facebook Page (opcional)
+      - PAGE_ID=${PAGE_ID:-}
+      - PAGE_ACCESS_TOKEN=${PAGE_ACCESS_TOKEN:-}
+
+      # Instagram (opcional)
+      - IG_USER_ID=${IG_USER_ID:-}
+      - IG_USER_ACCESS_TOKEN=${IG_USER_ACCESS_TOKEN:-}
+
+      # WhatsApp Business (opcional)
+      - WABA_ID=${WABA_ID:-}
+      - TEMPLATE_ID=${TEMPLATE_ID:-}
+      - MM_ACCESS_TOKEN=${MM_ACCESS_TOKEN:-}
+
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+      labels:
+        # Traefik - Enable
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik-public"
+
+        # HTTPS Router
+        - "traefik.http.routers.insights.rule=Host(`gestor.disparazap.com`)"
+        - "traefik.http.routers.insights.entrypoints=websecure"
+        - "traefik.http.routers.insights.tls=true"
+        - "traefik.http.routers.insights.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.insights.service=insights"
+
+        # HTTP Router (redirect to HTTPS)
+        - "traefik.http.routers.insights-http.rule=Host(`gestor.disparazap.com`)"
+        - "traefik.http.routers.insights-http.entrypoints=web"
+        - "traefik.http.routers.insights-http.middlewares=https-redirect"
+        - "traefik.http.routers.insights-http.service=insights"
+
+        # Middleware - HTTPS Redirect
+        - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+
+        # Service
+        - "traefik.http.services.insights.loadbalancer.server.port=3000"
+        - "traefik.http.services.insights.loadbalancer.healthcheck.path=/api/health"
+        - "traefik.http.services.insights.loadbalancer.healthcheck.interval=30s"
+        - "traefik.http.services.insights.loadbalancer.healthcheck.timeout=10s"
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  traefik-public:
+    external: true

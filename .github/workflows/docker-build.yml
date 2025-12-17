@@ -56,3 +56,15 @@ jobs:
             NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger VPS deployment via webhook
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          if [ -n "${{ secrets.WEBHOOK_URL }}" ]; then
+            curl -X POST "${{ secrets.WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d '{"source":"github-actions","image":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"}'
+            echo "Webhook triggered successfully"
+          else
+            echo "WEBHOOK_URL not configured, skipping deployment trigger"
+          fi
