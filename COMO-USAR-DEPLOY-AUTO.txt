@@ -1,0 +1,127 @@
+=============================================================================
+INSIGHTS DASHBOARD v1.1.0 - DEPLOY AUTOMÁTICO NA VPS
+=============================================================================
+
+📋 INSTRUÇÕES RÁPIDAS:
+
+1️⃣ Conecte na VPS via SSH:
+
+   ssh root@168.231.92.148
+   Senha: Barbie98####
+
+
+2️⃣ Execute este comando único (copie e cole tudo):
+
+   curl -fsSL https://raw.githubusercontent.com/WillCoelli/insights_dashboard/main/deploy-vps-auto.sh -o deploy.sh && chmod +x deploy.sh && ./deploy.sh
+
+
+3️⃣ Siga as instruções na tela:
+
+   - O script vai verificar/instalar Docker
+   - Inicializar Docker Swarm
+   - Baixar as configurações
+   - Pedir para você configurar as variáveis do Supabase
+   - Fazer deploy de tudo automaticamente
+
+
+4️⃣ Variáveis que você precisa ter em mãos:
+
+   ✅ NEXT_PUBLIC_SUPABASE_URL (exemplo: https://seu-projeto.supabase.co)
+   ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY (chave pública)
+   ✅ SUPABASE_SERVICE_ROLE_KEY (chave privada)
+   ✅ ACME_EMAIL (seu email para Let's Encrypt)
+
+
+5️⃣ Após o deploy:
+
+   Acesse: https://gestor.disparazap.com
+
+
+=============================================================================
+ALTERNATIVA: Deploy manual passo a passo
+=============================================================================
+
+Se preferir fazer manualmente, conecte na VPS e execute:
+
+# Baixar o script
+wget https://raw.githubusercontent.com/WillCoelli/insights_dashboard/main/deploy-vps-auto.sh
+
+# Tornar executável
+chmod +x deploy-vps-auto.sh
+
+# Executar
+./deploy-vps-auto.sh
+
+
+=============================================================================
+COMANDOS ÚTEIS DEPOIS DO DEPLOY
+=============================================================================
+
+# Ver logs em tempo real
+docker service logs insights_insights-dashboard -f
+
+# Verificar status dos serviços
+docker service ls
+
+# Ver réplicas
+docker service ps insights_insights-dashboard
+
+# Testar health
+curl https://gestor.disparazap.com/api/health
+
+# Escalar para 4 réplicas
+docker service scale insights_insights-dashboard=4
+
+# Reiniciar serviço
+docker service update --force insights_insights-dashboard
+
+# Remover tudo (cuidado!)
+docker stack rm insights
+docker stack rm traefik
+
+
+=============================================================================
+TROUBLESHOOTING
+=============================================================================
+
+❌ PROBLEMA: HTTPS não funciona
+
+✅ SOLUÇÃO:
+   1. Verifique se o DNS aponta para o servidor:
+      nslookup gestor.disparazap.com
+
+   2. Aguarde alguns minutos para o Let's Encrypt gerar certificado
+
+   3. Veja os logs do Traefik:
+      docker service logs traefik_traefik -f
+
+
+❌ PROBLEMA: Serviço não sobe
+
+✅ SOLUÇÃO:
+   1. Veja os logs:
+      docker service logs insights_insights-dashboard -f
+
+   2. Verifique se as variáveis estão corretas:
+      cat ~/insights-deploy/.env
+
+
+❌ PROBLEMA: Erro ao baixar imagem
+
+✅ SOLUÇÃO:
+   A imagem está pública no GitHub Container Registry.
+   Se houver erro, aguarde o GitHub Actions terminar o build:
+   https://github.com/WillCoelli/insights_dashboard/actions
+
+
+=============================================================================
+SUPORTE
+=============================================================================
+
+📖 Documentação completa:
+   https://github.com/WillCoelli/insights_dashboard/blob/main/DEPLOY-PRODUCTION.md
+
+🐛 Reportar problemas:
+   https://github.com/WillCoelli/insights_dashboard/issues
+
+=============================================================================
